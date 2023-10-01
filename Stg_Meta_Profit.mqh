@@ -1,71 +1,71 @@
 /**
  * @file
- * Implements Equity meta strategy.
+ * Implements Profit meta strategy.
  */
 
 // Prevents processing this includes file multiple times.
-#ifndef STG_META_EQUITY_MQH
-#define STG_META_EQUITY_MQH
+#ifndef STG_META_PROFIT_MQH
+#define STG_META_PROFIT_MQH
 
 // User input params.
-INPUT2_GROUP("Meta Equity strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_Equity_Strategy_Equity_Normal = STRAT_DEMARKER;  // Strategy for normal equity (-5-5%)
-INPUT2 ENUM_STRATEGY Meta_Equity_Strategy_Equity_GT_5 = STRAT_NONE;        // Strategy for high equity (5-10%)
-INPUT2 ENUM_STRATEGY Meta_Equity_Strategy_Equity_LT_5 = STRAT_NONE;        // Strategy for low equity (-5-10%)
-INPUT2 ENUM_STRATEGY Meta_Equity_Strategy_Equity_GT_10 = STRAT_NONE;       // Strategy for very high equity (>10%)
-INPUT2 ENUM_STRATEGY Meta_Equity_Strategy_Equity_LT_10 = STRAT_NONE;       // Strategy for very low equity (<-10%)
-INPUT2_GROUP("Meta Equity strategy: common params");
-INPUT2 float Meta_Equity_LotSize = 0;                // Lot size
-INPUT2 int Meta_Equity_SignalOpenMethod = 0;         // Signal open method
-INPUT2 float Meta_Equity_SignalOpenLevel = 0;        // Signal open level
-INPUT2 int Meta_Equity_SignalOpenFilterMethod = 32;  // Signal open filter method
-INPUT2 int Meta_Equity_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
-INPUT2 int Meta_Equity_SignalOpenBoostMethod = 0;    // Signal open boost method
-INPUT2 int Meta_Equity_SignalCloseMethod = 0;        // Signal close method
-INPUT2 int Meta_Equity_SignalCloseFilter = 32;       // Signal close filter (-127-127)
-INPUT2 float Meta_Equity_SignalCloseLevel = 0;       // Signal close level
-INPUT2 int Meta_Equity_PriceStopMethod = 1;          // Price limit method
-INPUT2 float Meta_Equity_PriceStopLevel = 2;         // Price limit level
-INPUT2 int Meta_Equity_TickFilterMethod = 32;        // Tick filter method (0-255)
-INPUT2 float Meta_Equity_MaxSpread = 4.0;            // Max spread to trade (in pips)
-INPUT2 short Meta_Equity_Shift = 0;                  // Shift
-INPUT2 float Meta_Equity_OrderCloseLoss = 200;       // Order close loss
-INPUT2 float Meta_Equity_OrderCloseProfit = 200;     // Order close profit
-INPUT2 int Meta_Equity_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
+INPUT2_GROUP("Meta Profit strategy: main params");
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_Normal = STRAT_DEMARKER;  // Strategy for normal profit (-5-5%)
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_GT_5 = STRAT_NONE;        // Strategy for high profit (5-10%)
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_LT_5 = STRAT_NONE;        // Strategy for low profit (-5-10%)
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_GT_10 = STRAT_NONE;       // Strategy for very high profit (>10%)
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_LT_10 = STRAT_NONE;       // Strategy for very low profit (<-10%)
+INPUT2_GROUP("Meta Profit strategy: common params");
+INPUT2 float Meta_Profit_LotSize = 0;                // Lot size
+INPUT2 int Meta_Profit_SignalOpenMethod = 0;         // Signal open method
+INPUT2 float Meta_Profit_SignalOpenLevel = 0;        // Signal open level
+INPUT2 int Meta_Profit_SignalOpenFilterMethod = 32;  // Signal open filter method
+INPUT2 int Meta_Profit_SignalOpenFilterTime = 3;     // Signal open filter time (0-31)
+INPUT2 int Meta_Profit_SignalOpenBoostMethod = 0;    // Signal open boost method
+INPUT2 int Meta_Profit_SignalCloseMethod = 0;        // Signal close method
+INPUT2 int Meta_Profit_SignalCloseFilter = 32;       // Signal close filter (-127-127)
+INPUT2 float Meta_Profit_SignalCloseLevel = 0;       // Signal close level
+INPUT2 int Meta_Profit_PriceStopMethod = 1;          // Price limit method
+INPUT2 float Meta_Profit_PriceStopLevel = 2;         // Price limit level
+INPUT2 int Meta_Profit_TickFilterMethod = 32;        // Tick filter method (0-255)
+INPUT2 float Meta_Profit_MaxSpread = 4.0;            // Max spread to trade (in pips)
+INPUT2 short Meta_Profit_Shift = 0;                  // Shift
+INPUT2 float Meta_Profit_OrderCloseLoss = 200;       // Order close loss
+INPUT2 float Meta_Profit_OrderCloseProfit = 200;     // Order close profit
+INPUT2 int Meta_Profit_OrderCloseTime = 2880;        // Order close time in mins (>0) or bars (<0)
 
 // Structs.
 // Defines struct with default user strategy values.
-struct Stg_Meta_Equity_Params_Defaults : StgParams {
-  Stg_Meta_Equity_Params_Defaults()
-      : StgParams(::Meta_Equity_SignalOpenMethod, ::Meta_Equity_SignalOpenFilterMethod, ::Meta_Equity_SignalOpenLevel,
-                  ::Meta_Equity_SignalOpenBoostMethod, ::Meta_Equity_SignalCloseMethod, ::Meta_Equity_SignalCloseFilter,
-                  ::Meta_Equity_SignalCloseLevel, ::Meta_Equity_PriceStopMethod, ::Meta_Equity_PriceStopLevel,
-                  ::Meta_Equity_TickFilterMethod, ::Meta_Equity_MaxSpread, ::Meta_Equity_Shift) {
-    Set(STRAT_PARAM_LS, ::Meta_Equity_LotSize);
-    Set(STRAT_PARAM_OCL, ::Meta_Equity_OrderCloseLoss);
-    Set(STRAT_PARAM_OCP, ::Meta_Equity_OrderCloseProfit);
-    Set(STRAT_PARAM_OCT, ::Meta_Equity_OrderCloseTime);
-    Set(STRAT_PARAM_SOFT, ::Meta_Equity_SignalOpenFilterTime);
+struct Stg_Meta_Profit_Params_Defaults : StgParams {
+  Stg_Meta_Profit_Params_Defaults()
+      : StgParams(::Meta_Profit_SignalOpenMethod, ::Meta_Profit_SignalOpenFilterMethod, ::Meta_Profit_SignalOpenLevel,
+                  ::Meta_Profit_SignalOpenBoostMethod, ::Meta_Profit_SignalCloseMethod, ::Meta_Profit_SignalCloseFilter,
+                  ::Meta_Profit_SignalCloseLevel, ::Meta_Profit_PriceStopMethod, ::Meta_Profit_PriceStopLevel,
+                  ::Meta_Profit_TickFilterMethod, ::Meta_Profit_MaxSpread, ::Meta_Profit_Shift) {
+    Set(STRAT_PARAM_LS, ::Meta_Profit_LotSize);
+    Set(STRAT_PARAM_OCL, ::Meta_Profit_OrderCloseLoss);
+    Set(STRAT_PARAM_OCP, ::Meta_Profit_OrderCloseProfit);
+    Set(STRAT_PARAM_OCT, ::Meta_Profit_OrderCloseTime);
+    Set(STRAT_PARAM_SOFT, ::Meta_Profit_SignalOpenFilterTime);
   }
 };
 
-class Stg_Meta_Equity : public Strategy {
+class Stg_Meta_Profit : public Strategy {
  protected:
   Account account;
   DictStruct<long, Ref<Strategy>> strats;
 
  public:
-  Stg_Meta_Equity(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
+  Stg_Meta_Profit(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
       : Strategy(_sparams, _tparams, _cparams, _name) {}
 
-  static Stg_Meta_Equity *Init(ENUM_TIMEFRAMES _tf = NULL, EA *_ea = NULL) {
+  static Stg_Meta_Profit *Init(ENUM_TIMEFRAMES _tf = NULL, EA *_ea = NULL) {
     // Initialize strategy initial values.
-    Stg_Meta_Equity_Params_Defaults stg_meta_equity_defaults;
-    StgParams _stg_params(stg_meta_equity_defaults);
+    Stg_Meta_Profit_Params_Defaults stg_meta_profit_defaults;
+    StgParams _stg_params(stg_meta_profit_defaults);
     // Initialize Strategy instance.
     ChartParams _cparams(_tf, _Symbol);
     TradeParams _tparams;
-    Strategy *_strat = new Stg_Meta_Equity(_stg_params, _tparams, _cparams, "(Meta) Equity");
+    Strategy *_strat = new Stg_Meta_Profit(_stg_params, _tparams, _cparams, "(Meta) Profit");
     return _strat;
   }
 
@@ -73,11 +73,11 @@ class Stg_Meta_Equity : public Strategy {
    * Event on strategy's init.
    */
   void OnInit() {
-    StrategyAdd(Meta_Equity_Strategy_Equity_Normal, 1);
-    StrategyAdd(Meta_Equity_Strategy_Equity_GT_5, 2);
-    StrategyAdd(Meta_Equity_Strategy_Equity_LT_5, 3);
-    StrategyAdd(Meta_Equity_Strategy_Equity_GT_10, 4);
-    StrategyAdd(Meta_Equity_Strategy_Equity_LT_10, 5);
+    StrategyAdd(Meta_Profit_Strategy_Profit_Normal, 1);
+    StrategyAdd(Meta_Profit_Strategy_Profit_GT_5, 2);
+    StrategyAdd(Meta_Profit_Strategy_Profit_LT_5, 3);
+    StrategyAdd(Meta_Profit_Strategy_Profit_GT_10, 4);
+    StrategyAdd(Meta_Profit_Strategy_Profit_LT_10, 5);
   }
 
   /**
@@ -294,22 +294,22 @@ class Stg_Meta_Equity : public Strategy {
       // Ignores calculation when method is 0.
       return (float)_result;
     }
-    float _equity_pct = (float)Math::ChangeInPct(account.GetTotalBalance(), account.AccountEquity());
+    float _profit_pct = (float)Math::ChangeInPct(account.GetTotalBalance(), account.AccountProfit());
     Ref<Strategy> _strat_ref;
-    if (_equity_pct > -5.0f && _equity_pct < 5.0f) {
-      // Equity value is in normal range (between -5% and 5%).
+    if (_profit_pct > -5.0f && _profit_pct < 5.0f) {
+      // Profit value is in normal range (between -5% and 5%).
       _strat_ref = strats.GetByKey(1);
-    } else if (_equity_pct >= 10.0f) {
-      // Equity value is very high (greater than 10%).
+    } else if (_profit_pct >= 10.0f) {
+      // Profit value is very high (greater than 10%).
       _strat_ref = strats.GetByKey(4);
-    } else if (_equity_pct <= -10.0f) {
-      // Equity value is very low (lower than 10%).
+    } else if (_profit_pct <= -10.0f) {
+      // Profit value is very low (lower than 10%).
       _strat_ref = strats.GetByKey(5);
-    } else if (_equity_pct >= 5.0f) {
-      // Equity value is high (between 5% and 10%).
+    } else if (_profit_pct >= 5.0f) {
+      // Profit value is high (between 5% and 10%).
       _strat_ref = strats.GetByKey(2);
-    } else if (_equity_pct <= -5.0f) {
-      // Equity value is low (between -5% and -10%).
+    } else if (_profit_pct <= -5.0f) {
+      // Profit value is low (between -5% and -10%).
       _strat_ref = strats.GetByKey(3);
     }
 
@@ -331,22 +331,22 @@ class Stg_Meta_Equity : public Strategy {
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
     bool _result = true;
     // uint _ishift = _indi.GetShift();
-    float _equity_pct = (float)Math::ChangeInPct(account.GetTotalBalance(), account.AccountEquity());
+    float _profit_pct = (float)Math::ChangeInPct(account.GetTotalBalance(), account.AccountProfit());
     Ref<Strategy> _strat_ref;
-    if (_equity_pct > -5.0f && _equity_pct < 5.0f) {
-      // Equity value is in normal range (between -5% and 5%).
+    if (_profit_pct > -5.0f && _profit_pct < 5.0f) {
+      // Profit value is in normal range (between -5% and 5%).
       _strat_ref = strats.GetByKey(1);
-    } else if (_equity_pct >= 10.0f) {
-      // Equity value is very high (greater than 10%).
+    } else if (_profit_pct >= 10.0f) {
+      // Profit value is very high (greater than 10%).
       _strat_ref = strats.GetByKey(4);
-    } else if (_equity_pct <= -10.0f) {
-      // Equity value is very low (lower than 10%).
+    } else if (_profit_pct <= -10.0f) {
+      // Profit value is very low (lower than 10%).
       _strat_ref = strats.GetByKey(5);
-    } else if (_equity_pct >= 5.0f) {
-      // Equity value is high (between 5% and 10%).
+    } else if (_profit_pct >= 5.0f) {
+      // Profit value is high (between 5% and 10%).
       _strat_ref = strats.GetByKey(2);
-    } else if (_equity_pct <= -5.0f) {
-      // Equity value is low (between -5% and -10%).
+    } else if (_profit_pct <= -5.0f) {
+      // Profit value is low (between -5% and -10%).
       _strat_ref = strats.GetByKey(3);
     }
 
@@ -371,4 +371,4 @@ class Stg_Meta_Equity : public Strategy {
   }
 };
 
-#endif  // STG_META_EQUITY_MQH
+#endif  // STG_META_PROFIT_MQH

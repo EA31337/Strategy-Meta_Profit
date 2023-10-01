@@ -1,6 +1,6 @@
 /**
  * @file
- * Implements Equity meta strategy.
+ * Implements Profit meta strategy.
  */
 
 // Includes conditional compilation directives.
@@ -35,10 +35,10 @@ input bool Info_On_Chart = true;          // Display info on chart.
 #include "Stg_Meta_Profit.mqh"
 
 // Defines.
-#define ea_name "Strategy Meta Equity"
+#define ea_name "Strategy Meta Profit"
 #define ea_version "2.000"
-#define ea_desc "Equity meta strategy to trade with different strategies based on the current account's equity values."
-#define ea_link "https://github.com/EA31337/Strategy-Meta_Equity"
+#define ea_desc "Profit meta strategy to trade with different strategies based on the current account's profit."
+#define ea_link "https://github.com/EA31337/Strategy-Meta_Profit"
 #define ea_author "EA31337 Ltd"
 
 // Properties.
@@ -64,7 +64,7 @@ int OnInit() {
   bool _result = true;
   EAParams ea_params(__FILE__, Log_Level);
   ea = new EA(ea_params);
-  _result &= ea.StrategyAdd<Stg_Meta_Equity>(Active_Tfs);
+  _result &= ea.StrategyAdd<Stg_Meta_Profit>(Active_Tfs);
   return (_result ? INIT_SUCCEEDED : INIT_FAILED);
 }
 

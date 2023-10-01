@@ -6,7 +6,7 @@
 
 /**
  * @file
- * Implements Equity meta strategy.
+ * Implements Profit meta strategy.
  */
 
 // Includes the main code.
