@@ -10,4 +10,4 @@
  */
 
 // Includes the main code.
-#include "Stg_Meta_Equity.mq5"
+#include "Stg_Meta_Profit.mq5"
