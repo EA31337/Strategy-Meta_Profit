@@ -10,8 +10,9 @@
 // User input params.
 INPUT2_GROUP("Meta Profit strategy: main params");
 INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_LT_1PCT = STRAT_DEMARKER;  // Strategy for daily profit below 1%
-INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_GT_1PCT = STRAT_NONE;  // Strategy for daily profit above 1% (>1%)
-INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_W_GT_5PCT = STRAT_NONE;  // Strategy for weekly profit above 5% (>5%)
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_GT_1PCT = STRAT_DPO;       // Strategy for daily profit above 1%
+// INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_W_GT_5PCT = STRAT_NONE;  // Strategy for weekly profit above 5%
+// (>5%)
 INPUT2_GROUP("Meta Profit strategy: common params");
 INPUT2 float Meta_Profit_LotSize = 0;                // Lot size
 INPUT2 int Meta_Profit_SignalOpenMethod = 0;         // Signal open method
@@ -49,6 +50,7 @@ struct Stg_Meta_Profit_Params_Defaults : StgParams {
 
 class Stg_Meta_Profit : public Strategy {
  protected:
+  float dbalance;
   Account account;
   DictStruct<long, Ref<Strategy>> strats;
 
@@ -73,7 +75,7 @@ class Stg_Meta_Profit : public Strategy {
   void OnInit() {
     StrategyAdd(Meta_Profit_Strategy_Profit_D_LT_1PCT, 1);
     StrategyAdd(Meta_Profit_Strategy_Profit_D_GT_1PCT, 2);
-    StrategyAdd(Meta_Profit_Strategy_Profit_W_GT_5PCT, 3);
+    // StrategyAdd(Meta_Profit_Strategy_Profit_W_GT_5PCT, 3);
   }
 
   /**
@@ -281,6 +283,17 @@ class Stg_Meta_Profit : public Strategy {
   }
 
   /**
+   * Event on new time periods.
+   */
+  virtual void OnPeriod(unsigned int _periods = DATETIME_NONE) {
+    if ((_periods & DATETIME_DAY) != 0) {
+      // New day started.
+      // Reset current daily balance.
+      dbalance = account.GetTotalBalance();
+    }
+  }
+
+  /**
    * Gets price stop value.
    */
   float PriceStop(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0f,
@@ -290,10 +303,10 @@ class Stg_Meta_Profit : public Strategy {
       // Ignores calculation when method is 0.
       return (float)_result;
     }
-    float _profit_daily_pct = 0;
+    float _profit_daily_pct = (float)Math::ChangeInPct(dbalance, account.GetTotalBalance(), true);
     float _profit_weekly_pct = 0;
     Ref<Strategy> _strat_ref;
-    if (_profit_daily_pct < -1.0f) {
+    if (_profit_daily_pct < 1.0f) {
       // Daily profit below 1%.
       _strat_ref = strats.GetByKey(1);
     } else if (_profit_daily_pct >= 1.0f) {
@@ -322,10 +335,10 @@ class Stg_Meta_Profit : public Strategy {
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
     bool _result = true;
     // uint _ishift = _indi.GetShift();
-    float _profit_daily_pct = 0;
+    float _profit_daily_pct = (float)Math::ChangeInPct(dbalance, account.GetTotalBalance(), true);
     float _profit_weekly_pct = 0;
     Ref<Strategy> _strat_ref;
-    if (_profit_daily_pct < -1.0f) {
+    if (_profit_daily_pct < 1.0f) {
       // Daily profit below 1%.
       _strat_ref = strats.GetByKey(1);
     } else if (_profit_daily_pct >= 1.0f) {
