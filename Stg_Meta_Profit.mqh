@@ -10,7 +10,7 @@
 // User input params.
 INPUT2_GROUP("Meta Profit strategy: main params");
 INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_LT_1PCT = STRAT_DEMARKER;  // Strategy for daily profit below 1%
-INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_GT_1PCT = STRAT_NONE;      // Strategy for daily profit above 1%
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_GT_1PCT = STRAT_DPO;       // Strategy for daily profit above 1%
 // INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_W_GT_5PCT = STRAT_NONE;  // Strategy for weekly profit above 5%
 // (>5%)
 INPUT2_GROUP("Meta Profit strategy: common params");
@@ -50,6 +50,7 @@ struct Stg_Meta_Profit_Params_Defaults : StgParams {
 
 class Stg_Meta_Profit : public Strategy {
  protected:
+  float dbalance;
   Account account;
   DictStruct<long, Ref<Strategy>> strats;
 
@@ -281,40 +282,15 @@ class Stg_Meta_Profit : public Strategy {
     return _result;
   }
 
-  // Define the function to check account balance at a specific time
-  double AccountBalanceCheck(datetime checkTime) {
-    double balance = 0.0;
-    int totalOrders = HistoryDealsTotal();
-
-    for (int i = 0; i < totalOrders; i++) {
-      ulong ticket = HistoryDealGetTicket(i);
-      datetime orderTime = (datetime)HistoryDealGetInteger(ticket, DEAL_TIME);
-
-      if (orderTime <= checkTime) {
-        double profit = HistoryDealGetDouble(ticket, DEAL_PROFIT);
-        balance += profit;
-      }
+  /**
+   * Event on new time periods.
+   */
+  virtual void OnPeriod(unsigned int _periods = DATETIME_NONE) {
+    if ((_periods & DATETIME_DAY) != 0) {
+      // New day started.
+      // Reset current daily balance.
+      dbalance = account.GetTotalBalance();
     }
-
-    return balance;
-  }
-
-  // Calculate account balance for the previous day
-  double CalculateAccountBalanceForPreviousDay() {
-    datetime previousDayStart = TimeCurrent();
-    int dayOfWeek = DateTimeStatic::DayOfWeek(previousDayStart);
-    int shift = (dayOfWeek == 0) ? 2 : (dayOfWeek == 1) ? 3 : 1;
-    previousDayStart -= shift * PeriodSeconds();
-
-    datetime previousDayEnd = previousDayStart + PeriodSeconds() - 1;
-    double accountBalance = 0.0;
-
-    for (datetime t = previousDayStart; t <= previousDayEnd; t += PeriodSeconds()) {
-      double balance = AccountBalanceCheck(t);
-      accountBalance += balance;
-    }
-
-    return accountBalance;
   }
 
   /**
@@ -327,7 +303,7 @@ class Stg_Meta_Profit : public Strategy {
       // Ignores calculation when method is 0.
       return (float)_result;
     }
-    float _profit_daily_pct = 0;
+    float _profit_daily_pct = (float)Math::ChangeInPct(dbalance, account.GetTotalBalance(), true);
     float _profit_weekly_pct = 0;
     Ref<Strategy> _strat_ref;
     if (_profit_daily_pct < 1.0f) {
@@ -359,9 +335,7 @@ class Stg_Meta_Profit : public Strategy {
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method, float _level = 0.0f, int _shift = 0) {
     bool _result = true;
     // uint _ishift = _indi.GetShift();
-    float _profit_curr_day = (float)AccountBalanceCheck(::TimeCurrent());  // account.AccountEquity()
-    float _profit_prev_day = (float)CalculateAccountBalanceForPreviousDay();
-    float _profit_daily_pct = (float)Math::ChangeInPct(_profit_prev_day, _profit_curr_day);
+    float _profit_daily_pct = (float)Math::ChangeInPct(dbalance, account.GetTotalBalance(), true);
     float _profit_weekly_pct = 0;
     Ref<Strategy> _strat_ref;
     if (_profit_daily_pct < 1.0f) {
