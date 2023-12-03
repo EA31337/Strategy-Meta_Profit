@@ -9,8 +9,8 @@
 
 // User input params.
 INPUT2_GROUP("Meta Profit strategy: main params");
-INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_LT_1PCT = STRAT_DEMARKER;  // Strategy for daily profit below 1%
-INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_GT_1PCT = STRAT_DPO;       // Strategy for daily profit above 1%
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_LT_1PCT = STRAT_RSI;  // Strategy for daily profit below 1%
+INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_D_GT_1PCT = STRAT_AMA;  // Strategy for daily profit above 1%
 // INPUT2 ENUM_STRATEGY Meta_Profit_Strategy_Profit_W_GT_5PCT = STRAT_NONE;  // Strategy for weekly profit above 5%
 // (>5%)
 INPUT3_GROUP("Meta Profit strategy: common params");
